@@ -5,6 +5,17 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+  
+const loggingMiddleware = (req, res, next) => {
+  const timestamp = new Date().toISOString();
+  const method = req.method;
+  const url = req.url;
+
+  console.log(`[${timestamp}] ${method} ${url}`);
+  next();
+};
+
+app.use(loggingMiddleware);
 
 const authMiddleware = (req, res, next) => {
   const login = req.headers['x-login'];
@@ -16,7 +27,6 @@ const authMiddleware = (req, res, next) => {
   req.user = user;
   next();
 };
-
 
 const adminOnlyMiddleware = (req, res, next) => {
   if (!req.user || req.user.role !== 'admin') {
